@@ -1,8 +1,8 @@
-import openai
+from openai import OpenAI
 
 class OpenAIChatService:
     def __init__(self):
-        """
+        """gaming chair
         Constructor that does minimal work. Actual initialization is deferred to the `initialize` method.
         """
         self.api_key = None
@@ -14,7 +14,7 @@ class OpenAIChatService:
         :param api_key: API key for authenticating with the OpenAI service.
         :param model: The model to use for generating text completions.
         """
-        openai.api_key = api_key
+        #openai.api_key = api_key
         self.api_key = api_key
         self.model = model
 
@@ -30,11 +30,16 @@ class OpenAIChatService:
             raise ValueError("The service has not been initialized. Please call 'initialize' first.")
 
         try:
-            response = openai.ChatCompletion.create(
-                model=self.model,
-                messages=messages
+            client = OpenAI(
+                # This is the default and can be omitted
+                api_key = self.api_key
             )
-            return response.choices[0].message['content'] if response.choices else None
+
+            response = client.chat.completions.create(
+                messages = messages,
+                model="gpt-3.5-turbo",
+)
+            return response.choices[0].message.content if response.choices else None
         except Exception as e:
             print(f"Request failed: {e}")
             return None
@@ -44,7 +49,7 @@ if __name__ == "__main__":
     chat_service = OpenAIChatService()
     
     # Explicitly initialize the service before using it
-    chat_service.initialize("your_openai_api_key_here")
+    chat_service.initialize("")
 
     messages = [
         {"role": "system", "content": "You are a helpful assistant."},

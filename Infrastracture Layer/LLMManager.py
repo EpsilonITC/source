@@ -1,6 +1,16 @@
+from TextToSpeechService import OpenAITTSService
+from LLMService import OpenAIChatService
+
+import os
+from dotenv import load_dotenv
+
 class Task:
     def __init__(self, description):
         self.description = description
+
+class CommandResponse:
+    Command = None
+    Parameters = []
 
 class ResponseObject:
     def __init__(self, tasks, tts_response):
@@ -8,10 +18,89 @@ class ResponseObject:
         self.tts_response = tts_response  # TTS generated voice response as binary data
 
 class LLMManager:
-    def __init__(self, vtt_service, tts_service, chat_service):
-        self.vtt_service = vtt_service
-        self.tts_service = tts_service
-        self.chat_service = chat_service
+    def __init__(self):
+
+        load_dotenv()
+        api_key = os.getenv('API_KEY')
+        #self.vtt_service =
+        self.tts_service = OpenAITTSService()
+        self.chat_service = OpenAIChatService()
+
+        self.tts_service.initialize(api_key)
+        self.chat_service.initialize(api_key)
+
+    def create_prompt(self, message):
+
+        example = f"""
+
+                    {{
+                        "commands" : 
+                        [
+                            {{
+                                "command" : "COMMAND_NAME",
+                                "parameters" : [PARAMETER0]
+                            }},
+                            {{
+                                "command" : "COMMAND_NAME",
+                                "parameters" : [PARAMETER0]
+                            }}
+                        ],
+                        "text" : "Text to be said to the user"
+                    }}
+        """
+
+        prompt = f"""<definition>The user gives a message describing what is happening in the operational environment.
+                    You should analyze the situtaion and find solution to the problem that occurs.
+                    You should use given predefined commands to preapre a list of them to accomplish actions to solve the problem defined before.
+                    The predifened commands can be passed parameters that are defined in the list below.</definition>
+                    <tasks>LOCATE_OBJECT
+                        MOVE_TO_OBJECT(item_object)
+                        GRASP_OBJECT(item_object)
+                        LIFT_OBJECT(item_object)
+                        MOVE_TO_LOCATION(location)
+                        RELEASE_OBJECT(_item_object)
+                        SCAN_AREA()
+                        ADJUST_GRIP()
+                        VERIFY_OBJECT_GRASP()
+                        POSITION_ABOVE_OBJECT()
+                        LOWER_OBJECT()
+                        CHECK_OBJECT_PRESENCE(item_object)
+                        ALIGN_WITH_OBJECT()
+                        RETRACT_ARM()
+                        EXTEND_ARM()
+                        PAN_VIEW_LEFT()
+                        PAN_VIEW_RIGHT()
+                        TILT_VIEW_UP()
+                        TILT_VIEW_DOWN()
+                        RESET_POSITION()
+                    </tasks>
+                    <output>
+                    The output returned should be a JSON object containing a list of CommandResponse objects 
+                    (class CommandResponse:
+                        Command = None
+                        Parameters = []) and string containing text to be said to the user as a response.
+                    Example:
+                    {example}
+                    </output>
+                    <user_message>" {message} "</user_message>"""
+        
+        print(prompt)
+        return prompt
+        
+    def process_input(self, message):
+
+        prompt = self.create_prompt(message)
+        messages = [
+            {"role": "system", "content": "You are an assistant, that should be able to find solution to a given situation and provide the user withlist of commands to perform in case to solve that."},
+            {"role": "user", "content": prompt}
+        ]
+        chat_response = self.chat_service.chat_completion(messages)
+        print(chat_response)
+        if not chat_response:
+            print("Failed to generate chat response.")
+            return None
+        
+        #self.tts_service.text_to_speech(chat_response['text'])
 
     def handle_voice_input(self, voice_data):
         # Step 1: Convert voice to text
@@ -54,3 +143,8 @@ class LLMManager:
 # response_object = llm_manager.handle_voice_input(voice_data)
 # if response_object:
 #     # Process the tasks and play back the tts_response
+
+if __name__ == '__main__':
+
+    message = input()
+    response = LLMManager().process_input(message)
