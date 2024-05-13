@@ -29,7 +29,7 @@ class LLMManager:
         self.tts_service.initialize(api_key)
         self.chat_service.initialize(api_key)
 
-    def create_prompt(self, message):
+    def create_prompt(self, message, objects):
 
         example = f"""
 
@@ -74,22 +74,32 @@ class LLMManager:
                         TILT_VIEW_DOWN()
                         RESET_POSITION()
                     </tasks>
+
+                    <available_objects>
+                    {objects}
+                    </available_objects>
                     <output>
-                    The output returned should be a JSON object containing a list of CommandResponse objects 
+                    The output returned should be only a JSON object containing a list of CommandResponse objects 
                     (class CommandResponse:
                         Command = None
                         Parameters = []) and string containing text to be said to the user as a response.
-                    Example:
-                    {example}
                     </output>
-                    <user_message>" {message} "</user_message>"""
+                    Example:
+                    <output_example>
+                    {example}
+                    </output_example>
+                    <user_message>" {message} "</user_message>
+                    <conclusion>
+                    Return only the JSON object without any additional information
+                    </conclusion>
+                    """
         
         print(prompt)
         return prompt
         
-    def process_input(self, message):
+    def process_input(self, message, objects):
 
-        prompt = self.create_prompt(message)
+        prompt = self.create_prompt(message, objects)
         messages = [
             {"role": "system", "content": "You are an assistant, that should be able to find solution to a given situation and provide the user withlist of commands to perform in case to solve that."},
             {"role": "user", "content": prompt}
@@ -99,7 +109,7 @@ class LLMManager:
         if not chat_response:
             print("Failed to generate chat response.")
             return None
-        
+        return(chat_response)
         #self.tts_service.text_to_speech(chat_response['text'])
 
     def handle_voice_input(self, voice_data):
@@ -147,4 +157,4 @@ class LLMManager:
 if __name__ == '__main__':
 
     message = input()
-    response = LLMManager().process_input(message)
+    response = LLMManager().process_input(message, ["apple", "cola"])
