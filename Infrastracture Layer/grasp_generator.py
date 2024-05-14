@@ -38,6 +38,26 @@ class GraspGenerator:
         self.cam_to_robot_base = self.get_transform_matrix(
             camera.x, camera.y, camera.z, self.CAM_ROTATION)
 
+    def bb_to_robot_frame(self, pixel_coordinates):
+        x_p, y_p = pixel_coordinates
+
+        # Convert pixels to meters using pixel conversion rate
+        x_m = x_p / self.PIX_CONVERSION
+        y_m = y_p / self.PIX_CONVERSION
+
+        # Image space to camera's 3D space, assuming z = 0 for simplicity in plane conversion
+        img_xyz = np.array([x_m, y_m, 0, 1])
+
+        # Apply transformation from image space to camera space
+        cam_space = np.matmul(self.img_to_cam, img_xyz)
+
+        # Convert camera's 3D space to robot frame of reference
+        robot_frame_ref = np.matmul(self.cam_to_robot_base, cam_space)
+
+        # Return x, y coordinates in the robot frame, discarding z as it is not needed for this conversion
+        return robot_frame_ref[0], robot_frame_ref[1]
+
+
     def get_transform_matrix(self, x, y, z, rot):
         return np.array([
                         [np.cos(rot),   -np.sin(rot),   0,  x],
