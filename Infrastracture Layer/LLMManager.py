@@ -52,7 +52,9 @@ class LLMManager:
         prompt = f"""<definition>The user gives a message describing what is happening in the operational environment.
                     You should analyze the situtaion and find solution to the problem that occurs.
                     You should use given predefined commands to preapre a list of them to accomplish actions to solve the problem defined before.
-                    The predifened commands can be passed parameters that are defined in the list below.</definition>
+                    The predifened commands can be passed parameters that are defined in the list below.
+                    You should use only provided items to find the correct solution.
+                    Find the most stupid and funny solution. </definition>
                     <tasks>LOCATE_OBJECT
                         MOVE_TO_OBJECT(item_object)
                         GRASP_OBJECT(item_object)
@@ -89,9 +91,9 @@ class LLMManager:
                     {example}
                     </output_example>
                     <user_message>" {message} "</user_message>
-                    <conclusion>
-                    Return only the JSON object without any additional information
-                    </conclusion>
+                    <expected_output>
+                    Return only the JSON object without any additional information, so the output can be parsed to JSON format
+                    </expected_output>
                     """
         
         print(prompt)
@@ -101,7 +103,7 @@ class LLMManager:
 
         prompt = self.create_prompt(message, objects)
         messages = [
-            {"role": "system", "content": "You are an assistant, that should be able to find solution to a given situation and provide the user withlist of commands to perform in case to solve that."},
+            {"role": "system", "content": "You are a funny assistant, that should be able to find solution to a given situation and provide the user withlist of commands to perform in case to solve that. You should return only JSON object"},
             {"role": "user", "content": prompt}
         ]
         chat_response = self.chat_service.chat_completion(messages)

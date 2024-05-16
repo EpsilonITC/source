@@ -44,6 +44,12 @@ class YcbObjects:
         for obj_name in self.obj_names[:n]:
             info.append(self.get_obj_info(obj_name))
         return info
+    
+    def get_n_first_obj_names(self, n):
+        info = []
+        for obj_name in self.obj_names[:n]:
+            info.append(obj_name)
+        return info
 
 
 class PackPileData:
