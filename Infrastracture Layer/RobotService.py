@@ -73,8 +73,11 @@ class RobotService:
         for i in range(n):
             print(f'Trial {i}')
             #self.objects.shuffle_objects()
+            
             info = self.objects.get_n_first_obj_info(5)
-            object_names = self.class_names[0:5]   #self.objects.get_n_first_obj_names(5)
+            print(info)
+
+            object_names = ['005_tomato_soup_can', '011_banana', '009_gelatin_box', '035_power_drill', '037_scissors']   #self.objects.get_n_first_obj_names(5)
             self.env.create_packed(info)
 
             while len(self.env.obj_ids) != 0:
