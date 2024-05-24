@@ -43,7 +43,7 @@ def pack_scenario(n, vis, output, debug):
     camera = Camera((center_x, center_y, 1.9), (center_x, center_y, 0.785), 0.2, 2.0, (224, 224), 40)
     env = Environment(camera, vis=vis, debug=debug, finger_length=0.06)
     generator = GraspGenerator(network_path, camera, 5)
-    yolo_model = load_yolo_model(r"C:\Users\Visnu Ritesh\Downloads\best (8).pt")
+    yolo_model = load_yolo_model("yolo5.pt")
 
     for i in range(n):
         print(f'Trial {i}')

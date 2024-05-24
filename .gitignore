@@ -398,3 +398,7 @@ FodyWeavers.xsd
 *.sln.iml
 Infrastracture Layer/.env
 .vscode/settings.json
+Infrastracture Layer/yolo.pt
+Infrastracture Layer/yolo5.pt
+Infrastracture Layer/yolov8x.pt
+Application Layer/test.py
