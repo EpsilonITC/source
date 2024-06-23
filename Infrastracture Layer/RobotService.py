@@ -23,11 +23,13 @@ class RobotService:
     '021_bleach_cleanser', '024_bowl', '025_mug', '035_power_drill', '036_wood_block', 
     '037_scissors', '040_large_marker', '051_large_clamp', '052_extra_large_clamp', '061_foam_brick'
     ]
+
     def __init__(self):
         self.args = self.parse_args()
         #self.Configure()
 
     def parse_args(self):
+        # Set up argument parser for command line arguments
         parser = argparse.ArgumentParser(description='Grasping demo')
         parser.add_argument('--scenario', type=str, default='pack', help='Grasping scenario (pack)')
         parser.add_argument('--runs', type=int, default=1, help='Number of runs the scenario is executed')
@@ -35,10 +37,12 @@ class RobotService:
         return parser.parse_args()
 
     def load_yolo_model(self, weights_file):
+        # Load YOLO model with specified weights
         model = YOLO(weights_file)
         return model
 
     def Configure(self, vis, debug):
+        # Configure the environment, objects, camera, and models
         self.objects = YcbObjects('objects/ycb_objects', mod_orn=['ChipsCan', 'MustardBottle', 'TomatoSoupCan'], mod_stiffness=['Strawberry'])
         center_x, center_y = 0.05, -0.52
         self.network_path = 'network/trained-models/cornell-randsplit-rgbd-grconvnet3-drop1-ch32/epoch_19_iou_0.98'
@@ -47,29 +51,8 @@ class RobotService:
         self.generator = GraspGenerator(self.network_path, self.camera, 5)
         self.yolo_model = self.load_yolo_model("yolo5.pt")
 
-        # def parse_args():
-        # parser = argparse.ArgumentParser(description='Grasping demo')
-        # parser.add_argument('--scenario', type=str, default='pack', help='Grasping scenario (pack)')
-        # parser.add_argument('--runs', type=int, default=1, help='Number of runs the scenario is executed')
-        # parser.add_argument('--show-network-output', dest='output', type=bool, default=False, help='Show network output (True/False)')
-        # args = parser.parse_args()
-        # return args
-
-        # def load_yolo_model(weights_file):
-        # # Load YOLOv8 model with specified weights
-        # model = YOLO(weights_file)
-        # return model
-
-        # List of class names in order
-        # class_names = [
-        # '003_cracker_box', '004_sugar_box', '005_tomato_soup_can', '006_mustard_bottle', '007_tuna_fish_can', 
-        # '008_pudding_box', '009_gelatin_box', '010_potted_meat_can', '011_banana', '019_pitcher_base', 
-        # '021_bleach_cleanser', '024_bowl', '025_mug', '035_power_drill', '036_wood_block', 
-        # '037_scissors', '040_large_marker', '051_large_clamp', '052_extra_large_clamp', '061_foam_brick'
-        # ]
-
     def grasp(self, n, vis, output):
-
+        # Main function to perform grasping tasks
         for i in range(n):
             print(f'Trial {i}')
             #self.objects.shuffle_objects()
@@ -147,6 +130,7 @@ class RobotService:
             self.env.remove_all_obj()
 
 def main():
+    # Entry point of the program
     robotService = RobotService()
     args = robotService.parse_args()
     output = args.output
@@ -156,4 +140,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
