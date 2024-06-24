@@ -18,8 +18,9 @@ class ResponseObject:
         self.tts_response = tts_response  # TTS generated voice response as binary data
 
 class LLMManager:
-    def __init__(self):
+    def __init__(self, debug=True):
 
+        self.debug = debug
         load_dotenv()
         api_key = os.getenv('API_KEY')
         #self.vtt_service =
@@ -55,26 +56,9 @@ class LLMManager:
                     The predifened commands can be passed parameters that are defined in the list below.
                     You should use only provided items to find the correct solution.
                     Find the most stupid and funny solution. </definition>
-                    <tasks>LOCATE_OBJECT
-                        MOVE_TO_OBJECT(item_object)
+                    <tasks>
+                        LOCATE_OBJECT
                         GRASP_OBJECT(item_object)
-                        LIFT_OBJECT(item_object)
-                        MOVE_TO_LOCATION(location)
-                        RELEASE_OBJECT(_item_object)
-                        SCAN_AREA()
-                        ADJUST_GRIP()
-                        VERIFY_OBJECT_GRASP()
-                        POSITION_ABOVE_OBJECT()
-                        LOWER_OBJECT()
-                        CHECK_OBJECT_PRESENCE(item_object)
-                        ALIGN_WITH_OBJECT()
-                        RETRACT_ARM()
-                        EXTEND_ARM()
-                        PAN_VIEW_LEFT()
-                        PAN_VIEW_RIGHT()
-                        TILT_VIEW_UP()
-                        TILT_VIEW_DOWN()
-                        RESET_POSITION()
                     </tasks>
 
                     <available_objects>
@@ -95,8 +79,8 @@ class LLMManager:
                     Return only the JSON object without any additional information, so the output can be parsed to JSON format
                     </expected_output>
                     """
-        
-        print(prompt)
+        if self.debug:
+            print(prompt)
         return prompt
         
     def process_input(self, message, objects):
@@ -107,7 +91,8 @@ class LLMManager:
             {"role": "user", "content": prompt}
         ]
         chat_response = self.chat_service.chat_completion(messages)
-        print(chat_response)
+        if self.debug:
+            print(chat_response)
         if not chat_response:
             print("Failed to generate chat response.")
             return None

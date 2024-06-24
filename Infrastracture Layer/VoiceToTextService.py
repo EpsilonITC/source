@@ -87,6 +87,18 @@ class OpenAIVoiceToTextService:
             wf.setframerate(rate)
             wf.writeframes(b''.join(frames))
 
+    def GetText(self):
+        audio_file_path = "recorded_audio.wav"
+
+        load_dotenv()
+        api_key = os.getenv('API_KEY')
+        self.vtt_service.initialize(api_key)
+
+        self.vtt_service.record_audio(audio_file_path, duration=5)
+        text = vtt_service.speech_to_text(audio_file_path)
+        
+        return text
+
 # Example usage:
 if __name__ == "__main__":
     vtt_service = OpenAIVoiceToTextService()

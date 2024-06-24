@@ -486,7 +486,7 @@ class Environment:
             path, [init_x, init_y-margin, init_z], yaw, mod_orn, mod_stiffness)
 
         self.wait_until_all_still()
-        step = 0.01
+        step = 0.2
         self.move_obj_along_axis(left_obj_id, 0, '+', step, init_x)
         self.move_obj_along_axis(top_obj_id, 1, '-', step, init_y)
         self.move_obj_along_axis(right_obj_id, 0, '-', step, init_x)
